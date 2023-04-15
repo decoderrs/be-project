@@ -1,0 +1,32 @@
+{% extends "navbar.html" %}
+
+{% block body%}
+
+<div class="card" style="width: 25rem;">
+  <div class="card-body" >
+    <h3 class="card-title">Top 5 Stocks</h3>
+    <p class="card-text">Your top performing stocks in your portfolio</p>
+  </div>
+    <table class="table">
+  {%for stock in stocks%}
+        <tr>
+            <td>
+                <a href="/home/charts/{{stock.stock_name}}">{{stock.stock_name}}</a>
+            </td>
+            <td>{{stock.volume}}</td>
+            <td>{{stock.diff}}%</td>
+            {% if  stock.trend %}
+             <td><i class="bi bi-caret-up-fill" style="color: green;"></i></td>
+            {% else %}
+                <td><i class="bi bi-caret-down-fill" style="color: red;"></i></td>
+            {% endif %}
+
+    </tr>
+
+  {% endfor %}
+   </table>
+  <div class="card-body">
+  </div>
+</div>
+
+{% endblock %}

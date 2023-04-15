@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+</head>
+<body>
+  <h1>{{test_name}}{{title}}</h1>
+  <ul>
+  {% for student in students %}
+    <li>
+      {% if student.score > 80 %}Excellent{% else %}bad {% endif %}
+      <em>{{student.name}}:</em>{{student.score}}/{{max_score}}
+    </li>
+  {% endfor %}
+</ul>
+</body>
+</html>
