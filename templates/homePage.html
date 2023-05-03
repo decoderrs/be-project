@@ -2,31 +2,33 @@
 
 {% block body%}
 
-<div class="card" style="width: 25rem;">
-  <div class="card-body" >
-    <h3 class="card-title">Top 5 Stocks</h3>
-    <p class="card-text">Your top performing stocks in your portfolio</p>
-  </div>
-    <table class="table">
-  {%for stock in stocks%}
-        <tr>
-            <td>
-                <a href="/home/charts/{{stock.stock_name}}">{{stock.stock_name}}</a>
-            </td>
-            <td>{{stock.volume}}</td>
-            <td>{{stock.diff}}%</td>
-            {% if  stock.trend %}
-             <td><i class="bi bi-caret-up-fill" style="color: green;"></i></td>
-            {% else %}
-                <td><i class="bi bi-caret-down-fill" style="color: red;"></i></td>
-            {% endif %}
+  <h3>Top 5 Stocks</h3>
+<h1>Your top performing stocks in your portfolio</h1>
+<div class="row m-1">
+    {% for row in s_data %}
 
-    </tr>
+        <div class="col-12 col-md-4 my-3 ">
+             <a href="/static/{{row[1]}}" style="width: 25rem; text-decoration: none;">
+             <div class="card" style="border.radius: 10px;">
+                <div class="card-body" style="background-color: #686ce9; color: black;box-shadow: #200c4e 10px 10px 6px; border-radius: 10px;  ">
+                <p class="card-title">
+                <h4 style="text-align: center;">
+                   {{row[1]}}
+                </h4>
 
-  {% endfor %}
-   </table>
-  <div class="card-body">
-  </div>
+                </p>
+                <p class="card-text">Previous close  : {{row[3]}}</p>
+                <p class="card-text">Predicted Price : {{ row[4] }}%</p>
+                {% if  row[2] == 'POSITIVE' %}
+                     <p class="card-text">Sentiment : <i class="bi bi-caret-up-fill" style="color: green;"></i></p>
+                {% else %}
+                    <p class="card-text">Sentiement : <i class="bi bi-caret-down-fill" style="color: red;"></i></p>
+                {% endif %}
+            </div>
+        </div>
+                 </a>
+        </div>
+     {% endfor %}
 </div>
 
 {% endblock %}

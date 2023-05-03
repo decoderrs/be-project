@@ -1,89 +1,61 @@
-from flask import Flask, render_template
+import json
+
+from flask import Flask, render_template, jsonify
 import os
-import sqlite3
+import mysql.connector
+import requests
+
+from Controller.graphPlot import graphPlot
+from Controller.newsdb import newsDb
 
 app = Flask(__name__, template_folder=os.path.abspath('templates'), static_folder=os.path.abspath('static'))
+
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 
-max_score = 100
-test_name = "Python Challenge"
-students = [
-    {"name": "Sandrine", "score": 100},
-    {"name": "Gergeley", "score": 87},
-    {"name": "Fritz", "score": 92},
-    {"name": "Frieda", "score": 40},
-    {"name": "Sirius", "score": 75}
-]
+@app.route("/charts", methods=['GET', 'POST'])
+def event():
+    server_ip = 'http://127.0.0.1:8001/charts'
+    headers = {'Content-Type': 'application/json'}
+    event_data = {'data_1': 75, 'data_2': -1, 'data_3': 47, 'data_4': 'SBY'}
+    server_return = requests.post(server_ip, headers=headers, json=jsonify(event_data))
+    print(server_return.json())
+    return server_return.json()
 
-username = [
-    {"name": "home"},
-    {"name": "about"},
-    {"name": "contactus"},
-    {"name": "charts"}
-]
-stocks = [
-    {"stock_name": "RELIANCE" , "volume": 12000, "diff": round(2300/12000 , 2), "trend": True},
-    {"stock_name": "HDFCBANK", "volume": 12000, "diff": (2300/12000), "trend": False},
-    {"stock_name": "ADANIENT", "volume": 12000, "diff": (2300/12000), "trend": True},
-    {"stock_name": "ICICIBANK", "volume": 12000, "diff": (2300/12000), "trend": False},
-    {"stock_name": "SBIN", "volume": 12000, "diff": (2300/12000), "trend": True}
-]
-
-
-app = Flask(__name__)
-
-def get_db_connection():
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-@app.route('/index')
-def index():
-    conn = get_db_connection()
-    posts = conn.execute('SELECT * FROM posts').fetchall()
-    conn.close()
-    return render_template('index.html', posts=posts)
 
 @app.route("/home")
 def home():
+    print(cursor.rowcount, "record inserted.")
+    newsdb.delete_news()
+    newsdb.create()
     context = {
-        "username": username,
-        "stocks": stocks
+        "s_data": newsdb.read_news()
     }
     return render_template("homePage.html", **context)
 
 
-@app.route("/home/<uname>")
-def test(uname):
-    context = {
-        "username": username,
-        "uname": uname
-    }
-    return render_template("test.html",**context)
-
-
-@app.route("/results")
-def results():
-    context = {
-        "title": "Results",
-        "students": students,
-        "test_name": test_name,
-        "max_score": max_score,
-    }
-    return render_template("results.html", **context)
-
-
-@app.route("/home/charts/<s_name>")
+@app.route("/static/<s_name>")
 def charts(s_name):
     context = {
-        "username": username,
-        "stocks": stocks,
-        "s_name": s_name
+        "s_data": newsdb.read_news()
     }
-    return render_template("charts.html",**context)
+    return render_template("charts.html", **context)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=8000)
+    gp = graphPlot()
+    # gp.createGraph()
+
+    mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="system",
+        database="BE",
+        autocommit=True
+    )
+    
+
+    cursor = mydb.cursor()
+    newsdb = newsDb(cursor, mydb)
+
+    app.run(debug=True, port=8001)
